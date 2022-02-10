@@ -1,0 +1,88 @@
+DROP DATABASE IF EXISTS buyme;
+CREATE DATABASE buyme;
+USE buyme;
+
+CREATE TABLE accounts (
+  username varchar(30) NOT NULL,
+  password varchar(30) DEFAULT NULL,
+  user_type varchar(5) DEFAULT NULL,
+  auction_history varchar(1000) DEFAULT NULL,
+  unread_alerts integer DEFAULT '0',
+  PRIMARY KEY (username)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO accounts
+VALUES ('adminuser', 'adminpass', 'admin', '', '0'),
+	   ('testuser', 'testpass', 'user', '', '0'),
+       ('t', 't', 'user', '', '0'),
+       ('c', 'c', 'cr', '', '0');
+
+CREATE TABLE items (
+	item_id integer NOT NULL,
+    clothing_type varchar(30) DEFAULT NULL,
+    size varchar(30) DEFAULT NULL,
+    material varchar(30) DEFAULT NULL,
+    brand varchar(30) DEFAULT NULL,
+    current_bid varchar(30) DEFAULT NULL,
+    last_bidder varchar(30) DEFAULT NULL,
+    bid_history varchar(1000) DEFAULT NULL,
+    reserve integer DEFAULT NULL,
+    seller varchar(20) NOT NULL,
+    closing_time datetime NOT NULL,
+    winner varchar(30) DEFAULT NULL,
+    status integer DEFAULT '1',
+    PRIMARY KEY (item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO items
+VALUES ('1', 'pants', 'large', 'cotton', 'nike', '0', NULL, NULL, '0', 'testuser', '2021-06-04 11:11:15',  NULL, '1'),
+		('2', 'shirt', 'medium', 'wool', 'underarmour', '0', NULL, NULL, '50', 't', '2021-04-25 11:11:16', NULL, '0'),
+        ('3', 'hats', 'medium', 'silk', 'calvinklein', '50', 'testuser', NULL, '75', 't', '2021-04-25 12:11:16', NULL, '1'),
+        ('4', 'shirt', 'small', 'synthetic', 'adidas', '50', 't', NULL, '25', 't', '2021-04-25 12:11:15', NULL, '1'),
+        ('5', 'shirt', 'small', 'synthetic', 'adidas', '50', 'testuser', NULL, '25', 't', '2021-04-25 12:11:15', NULL, '1');
+        
+DROP TABLE IF EXISTS `iteminfo`;
+CREATE TABLE `iteminfo` (
+  `clothing_type` varchar(100) NOT NULL,
+  `brand` varchar(45) NOT NULL,
+  `count` int DEFAULT NULL,
+  `earnings` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`clothing_type`,`brand`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE autobid (
+	item_id integer NOT NULL,
+	username varchar(30) NOT NULL,
+    date_started datetime NOT NULL,
+    bid_increment integer NOT NULL,
+    upper_limit integer NOT NULL,
+	FOREIGN KEY (username) REFERENCES accounts(username),
+    FOREIGN KEY (item_id) REFERENCES items(item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO autobid
+VALUES ('4', 'testuser', '2021-01-01 11:11:12', '5', '100'),
+        ('3', 'testuser', '2021-01-01 11:11:12', '10', '100'),
+        ('4', 't', '2021-01-01 11:11:12', '10', '100'),
+        ('5', 'testuser', '2021-01-01 11:11:12', '10', '100');
+        
+CREATE TABLE `mail` (
+  `sender` varchar(50) NOT NULL,
+  `question` varchar(500) DEFAULT NULL,
+  `response` varchar(500) DEFAULT NULL,
+  `date_time` datetime NOT NULL,
+  `rep` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`sender`,`date_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+LOCK TABLES `mail` WRITE;
+/*!40000 ALTER TABLE `mail` DISABLE KEYS */;
+INSERT INTO `mail` VALUES ('heyman','who made this website LMAO','eggs','2021-04-25 13:03:11','cr'),('heyman','test','yeah','2021-04-25 13:04:20','cr'),('newa','where tf i am',NULL,'2021-04-25 09:47:48',NULL),('newa','hey','whats up','2021-04-25 10:44:10','c'),('testuser','how do i use this website?','idk dude','2021-04-25 08:08:25','testrep'),('yeadude','i dropped my keyboard in an infinite pit of maple syrup',NULL,'2021-04-25 14:47:02',NULL);
+/*!40000 ALTER TABLE `mail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+CREATE TABLE alerts (
+	username varchar(30) NOT NULL,
+    message varchar(500) NOT NULL,
+	FOREIGN KEY (username) REFERENCES accounts(username)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
